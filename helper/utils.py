@@ -18,21 +18,31 @@ def load_data(file_name):
     nodes = set()
 
     for tokens in data:
+        int_flag = False
         if is_int(tokens[0]):
             int_flag = True
         break
 
-    if int_flag:
+    if not int_flag:
+        array = list()
+        new_data = list()
         for tokens in data:
-            nodes.add(int(tokens[0]))
-            nodes.add(int(tokens[1]))
-        size = max(nodes) + 1
-        matrix = np.eye(size)
-        for tokens in data:
-            tokens = int(tokens[0]), int(tokens[1])
-            matrix.itemset((tokens[0], tokens[1]), 1)
-            matrix.itemset((tokens[1], tokens[0]), 1)
-        return normalize(matrix, norm='l1', axis=0)
+            if tokens[0] not in array:
+                array.append(tokens[0])
+            if tokens[1] not in array:
+                array.append(tokens[1])
+            new_data.append([array.index(tokens[0]), array.index(tokens[1])])
+        data = new_data
+    for tokens in data:
+        nodes.add(int(tokens[0]))
+        nodes.add(int(tokens[1]))
+    size = max(nodes) + 1
+    matrix = np.eye(size, dtype=np.float64)
+    for tokens in data:
+        tokens = int(tokens[0]), int(tokens[1])
+        matrix.itemset((tokens[0], tokens[1]), 1)
+        matrix.itemset((tokens[1], tokens[0]), 1)
+    return normalize(matrix, norm='l1', axis=0)
 
 
 def print_list(l, c=None, should_print=True):
