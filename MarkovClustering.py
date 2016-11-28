@@ -1,5 +1,4 @@
 from helper.utils import load_data
-from helper.utils import to_clu
 import numpy as np
 from sklearn.preprocessing import normalize
 from copy import deepcopy
@@ -16,14 +15,17 @@ class MarkovClustering(object):
         self.original = deepcopy(data)
 
     def transform(self, power, inflation):
-        matrix = self.data
+        __matrix__ = self.data
+        # prev = deepcopy(__matrix__)
         for i in xrange(power-1):
-            matrix = np.dot(matrix, self.original)
-            matrix = np.power(matrix, inflation)
-            matrix = normalize(matrix, norm='l1', axis=0)
-            # if np.allclose(prev, matrix, rtol=1):
+            print 'iteration:', i
+            __matrix__ = np.dot(__matrix__, self.original)
+            __matrix__ = np.power(__matrix__, inflation)
+            __matrix__ = normalize(__matrix__, norm='l1', axis=0)
+            # if np.allclose(prev, __matrix__, rtol=1):
             #     break
-        return matrix
+        print __matrix__
+        return __matrix__
 
     def fit_transform(self, data, power=5, inflation=2):
         self.fit(data)
@@ -34,7 +36,9 @@ filename = 'yeast_undirected_metabolic'
 
 mcl = MarkovClustering()
 data = load_data('data/' + filename + '.txt')
-matrix = mcl.fit_transform(data, power=10)
+print data
+matrix = mcl.fit_transform(data, power=20)
 matrix[matrix < .5] = 0
 print matrix
+# print_ndarray(matrix)
 to_clu(open('output/' + filename + '.clu', 'w'), matrix)

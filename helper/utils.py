@@ -1,6 +1,9 @@
 import numpy as np
 from sklearn.preprocessing import normalize
 import operator
+import math
+# np.set_printoptions(threshold=np.inf)
+
 
 def is_int(s):
     try:
@@ -82,6 +85,9 @@ class Matrix(np.ndarray):
 
 
 def to_clu(handle, matrix):
+
+
+
     output = ''
     mapping = dict()
     shape = matrix.shape[0]
@@ -104,3 +110,11 @@ def to_clu(handle, matrix):
     print mapping
     handle.write(output)
     handle.close()
+
+
+def print_ndarray(ndarray):
+    for row in ndarray:
+        print '[',
+        for element in row:
+            print "%.5f" % element, ",\t",
+        print ']'
