@@ -40,7 +40,7 @@ mcl = MarkovClustering()
 data, key_map = load_data('data/' + filename + '.txt')
 print data
 matrix = mcl.fit_transform(data, power=1000)
-matrix[matrix < .9] = 0
+matrix[matrix < .5] = 0
 print matrix
 # print_ndarray(matrix)
 to_clu(open('output/' + filename + '.clu', 'w'), matrix, key_map)
