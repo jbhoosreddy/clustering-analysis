@@ -29,9 +29,8 @@ def load_data(file_name):
         if is_int(tokens[0]):
             int_flag = True
         break
-
+    array = list()
     if not int_flag:
-        array = list()
         new_data = list()
         for tokens in data:
             if tokens[0] not in array:
@@ -85,7 +84,8 @@ class Matrix(np.ndarray):
         return np.asarray(args[0]).view(cls)
 
 
-def to_clu(handle, matrix, key_map):
+def to_clu(handle, matrix, key_map, should_map=False, is_str=False):
+    vertices = set(xrange(len(key_map)))
     cluster = 1
     seen = list()
     mapping = dict()
@@ -93,21 +93,35 @@ def to_clu(handle, matrix, key_map):
     size = matrix.shape[0]
     output += '*vertices ' + str(size) + "\n"
     for row in matrix:
-        empty_row = False
+        empty_row = True
         for index, element in enumerate(row):
             if element > 0:
                 if index not in seen:
-                    empty_row = True
+                    empty_row = False
                     seen.append(index)
-                    mapping[key_map[index]] = cluster
+                    if should_map:
+                        key = key_map[index]
+                        if not is_str:
+                            key = int(key)
+                        mapping[key] = cluster
+                    else:
+                        mapping[index+1] = cluster
         if len(seen) == size:
             break
-        if empty_row:
+        if not empty_row:
             cluster += 1
+    unseen = vertices - set(seen)
+    for element in unseen:
+        if should_map:
+            key = key_map[element]
+            if not is_str:
+                key = int(key)
+            mapping[key] = cluster
+        else:
+            mapping[element + 1] = cluster
     output += "\n".join(map(lambda m: str(m), mapping.values()))
     handle.write(output)
     handle.close()
-
 
 
 def print_ndarray(ndarray):

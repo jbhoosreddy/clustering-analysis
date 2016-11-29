@@ -37,11 +37,18 @@ class MarkovClustering(object):
 filename = 'yeast_undirected_metabolic'
 # filename = 'sample'
 
+if filename == 'physics_collaboration_net':
+    should_map = False
+    is_str = True
+else:
+    should_map = False
+    is_str = True
+
 mcl = MarkovClustering()
 data, key_map = load_data('data/' + filename + '.txt')
 print data
-matrix = mcl.fit_transform(data, power=5000)
+matrix = mcl.fit_transform(data, power=2000)
 matrix[matrix < .5] = 0
 print matrix
 # print_ndarray(matrix)
-to_clu(open('output/' + filename + '.clu', 'w'), matrix, key_map)
+to_clu(open('output/' + filename + '.clu', 'w'), matrix, key_map, should_map, is_str)
