@@ -6,6 +6,7 @@ import math
 
 
 def is_int(s):
+    return False
     try:
         int(s)
         return True
@@ -49,7 +50,7 @@ def load_data(file_name):
         matrix.itemset((tokens[0], tokens[1]), 1)
         matrix.itemset((tokens[1], tokens[0]), 1)
     # print matrix
-    return Matrix(normalize(matrix, norm='l1', axis=0))
+    return Matrix(normalize(matrix, norm='l1', axis=0)), array
 
 
 def print_list(l, c=None, should_print=True):
@@ -84,32 +85,29 @@ class Matrix(np.ndarray):
         return np.asarray(args[0]).view(cls)
 
 
-def to_clu(handle, matrix):
-
-
-
-    output = ''
+def to_clu(handle, matrix, key_map):
+    cluster = 1
+    seen = list()
     mapping = dict()
-    shape = matrix.shape[0]
-    output += '*vertices ' + str(shape) + "\n"
-    for i in xrange(shape):
-        for j in xrange(shape):
-            # if i == j:
-            #     continue
-            element = matrix[i,j]
-            if j not in mapping.keys():
-                mapping[j] = dict()
+    output = ''
+    size = matrix.shape[0]
+    output += '*vertices ' + str(size) + "\n"
+    for row in matrix:
+        empty_row = False
+        for index, element in enumerate(row):
             if element > 0:
-                mapping[j][i] = element
-            else:
-                mapping[j][j] = 0
-    for k, v in mapping.items():
-        output += str(sorted(mapping[k].items(), key=operator.itemgetter(1), reverse=True)[0][0]) + "\n"
-        mapping[k] = sorted(mapping[k].items(), key=operator.itemgetter(1), reverse=True)[0]
-    # print output
-    print mapping
+                if index not in seen:
+                    empty_row = True
+                    seen.append(index)
+                    mapping[key_map[index]] = cluster
+        if len(seen) == size:
+            break
+        if empty_row:
+            cluster += 1
+    output += "\n".join(map(lambda m: str(m), mapping.values()))
     handle.write(output)
     handle.close()
+
 
 
 def print_ndarray(ndarray):
