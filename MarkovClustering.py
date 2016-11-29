@@ -17,7 +17,6 @@ class MarkovClustering(object):
 
     def transform(self, power, inflation):
         __matrix__ = self.data
-        # prev = deepcopy(__matrix__)
         for i in xrange(power-1):
             print 'iteration:', i
             __matrix__ = np.dot(__matrix__, self.original)
@@ -37,18 +36,11 @@ class MarkovClustering(object):
 filename = 'yeast_undirected_metabolic'
 # filename = 'sample'
 
-if filename == 'physics_collaboration_net':
-    should_map = False
-    is_str = True
-else:
-    should_map = False
-    is_str = True
-
 mcl = MarkovClustering()
 data, key_map = load_data('data/' + filename + '.txt')
 print data
-matrix = mcl.fit_transform(data, power=2000)
-matrix[matrix < .5] = 0
+matrix = mcl.fit_transform(data, power=1000)
+matrix[matrix < .9] = 0
 print matrix
 # print_ndarray(matrix)
-to_clu(open('output/' + filename + '.clu', 'w'), matrix, key_map, should_map, is_str)
+to_clu(open('output/' + filename + '.clu', 'w'), matrix, key_map)

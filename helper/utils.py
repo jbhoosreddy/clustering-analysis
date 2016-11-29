@@ -84,7 +84,7 @@ class Matrix(np.ndarray):
         return np.asarray(args[0]).view(cls)
 
 
-def to_clu(handle, matrix, key_map, should_map=False, is_str=False):
+def to_clu(handle, matrix, key_map):
     vertices = set(xrange(len(key_map)))
     cluster = 1
     seen = list()
@@ -99,26 +99,14 @@ def to_clu(handle, matrix, key_map, should_map=False, is_str=False):
                 if index not in seen:
                     empty_row = False
                     seen.append(index)
-                    if should_map:
-                        key = key_map[index]
-                        if not is_str:
-                            key = int(key)
-                        mapping[key] = cluster
-                    else:
-                        mapping[index+1] = cluster
+                    mapping[index + 1] = cluster
         if len(seen) == size:
             break
         if not empty_row:
             cluster += 1
     unseen = vertices - set(seen)
     for element in unseen:
-        if should_map:
-            key = key_map[element]
-            if not is_str:
-                key = int(key)
-            mapping[key] = cluster
-        else:
-            mapping[element + 1] = cluster
+        mapping[element + 1] = cluster
     output += "\n".join(map(lambda m: str(m), mapping.values()))
     handle.write(output)
     handle.close()
